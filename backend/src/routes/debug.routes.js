@@ -11,7 +11,7 @@ router.get("/firestore", async (req, res) => {
 
     await ref.set({
       ok: true,
-      message: "Firestore connection works ✅",
+      message: "Firestore connection works",
       updatedAt: new Date().toISOString(),
     });
 

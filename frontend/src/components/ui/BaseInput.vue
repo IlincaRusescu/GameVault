@@ -1,4 +1,3 @@
-<template>
   <div class="field">
     <label v-if="label" class="label">{{ label }}</label>
     <input

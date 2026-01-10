@@ -1,14 +1,32 @@
-const { initFirebaseAdmin, admin } = require("../config/firebaseAdmin");
+const admin = require("firebase-admin");
+const path = require("path");
+const fs = require("fs");
 
-let db = null;
+function initFirebaseAdmin() {
+  if (admin.apps.length) return admin;
 
-function getDb() {
-  if (db) return db;
+  const serviceAccountPath = process.env.FIREBASE_SERVICE_ACCOUNT_PATH;
+  if (!serviceAccountPath) {
+    throw new Error("Missing FIREBASE_SERVICE_ACCOUNT_PATH in .env");
+  }
 
-  initFirebaseAdmin();
-  db = admin.firestore();
+  const absolutePath = path.resolve(process.cwd(), serviceAccountPath);
 
-  return db;
+  if (!fs.existsSync(absolutePath)) {
+    throw new Error(`Service account file not found at: ${absolutePath}`);
+  }
+
+  const serviceAccount = JSON.parse(fs.readFileSync(absolutePath, "utf-8"));
+
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+  });
+
+  return admin;
 }
 
-module.exports = { getDb };
+function getAdmin() {
+  return admin;
+}
+
+module.exports = { initFirebaseAdmin, getAdmin };
