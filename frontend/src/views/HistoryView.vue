@@ -1,5 +1,5 @@
 <template>
-  <PageHeader title="My Games" />
+  <PageHeader title="History" />
   <div class="content">...</div>
 </template>
 
