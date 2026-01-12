@@ -3,3 +3,4 @@ node_modules
 backend/secrets/
 **/secrets/
 **/*serviceAccount*.json
+scripts/games.json
