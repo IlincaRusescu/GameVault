@@ -216,7 +216,7 @@ function makeGame(index) {
   const now = new Date().toISOString();
 
   return {
-    // ✅ sequential & deterministic ids
+    //sequential & deterministic ids
     // If you want padded ids: game_001, game_002 -> use padStart
     gameId: `game_${index + 1}`,
     name: makeName(),

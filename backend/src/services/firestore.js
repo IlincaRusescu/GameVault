@@ -29,4 +29,9 @@ function getAdmin() {
   return admin;
 }
 
-module.exports = { initFirebaseAdmin, getAdmin };
+function getDb() {
+  initFirebaseAdmin();
+  return admin.firestore();
+}
+
+module.exports = { initFirebaseAdmin, getAdmin, getDb };

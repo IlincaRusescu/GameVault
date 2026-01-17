@@ -62,7 +62,7 @@ const router = createRouter({
   ],
 });
 
-// ✅ guard: dacă nu ai token -> login
+//guard: dacă nu ai token -> login
 router.beforeEach((to) => {
   const auth = useAuthStore();
 
