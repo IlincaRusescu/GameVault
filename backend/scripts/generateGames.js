@@ -8,7 +8,7 @@ const { faker } = require("@faker-js/faker");
  * Output: backend/scripts/games.json
  *
  * Run (from backend/):
- *   node scripts/generateGames.js 80
+ *   node scripts/generateGames.js 50
  */
 
 const CATEGORIES = [
@@ -16,14 +16,11 @@ const CATEGORIES = [
   "Family",
   "Party",
   "Card Game",
-  "Cooperative",
-  "Abstract",
-  "Eurogame",
-  "War Game",
-  "Dungeon Crawler",
-  "Dexterity",
   "Trivia",
+  "War Game",
+  "Eurogame",
 ];
+
 
 const MECHANICS = [
   "Worker Placement",
@@ -34,10 +31,6 @@ const MECHANICS = [
   "Set Collection",
   "Push Your Luck",
   "Hidden Roles",
-  "Roll and Write",
-  "Engine Building",
-  "Bluffing",
-  "Cooperative Play",
 ];
 
 const TAGS = [
@@ -59,15 +52,11 @@ const THEMES = [
   "Medieval",
   "Mythology",
   "Horror",
-  "Nature",
   "Economic",
   "Historical",
   "Pirates",
-  "Space",
   "Detective",
   "Post-Apocalyptic",
-  "Steampunk",
-  "Cyberpunk",
   "Farming",
   "City Building",
   "Adventure",
@@ -102,13 +91,7 @@ function makePlayers(category) {
     return { min, max };
   }
 
-  if (category === "Strategy" || category === "Eurogame") {
-    const min = faker.helpers.arrayElement([1, 2]);
-    const max = faker.helpers.arrayElement([4, 5]);
-    return { min, max };
-  }
-
-  if (category === "Dungeon Crawler" || category === "Cooperative") {
+  if (category === "Strategy" || category === "Eurogame" || category === "War Game") {
     const min = faker.helpers.arrayElement([1, 2]);
     const max = faker.helpers.arrayElement([4, 5]);
     return { min, max };
@@ -120,16 +103,16 @@ function makePlayers(category) {
 }
 
 function makePlayTime(category) {
-  if (category === "Party" || category === "Dexterity") return { min: 10, max: 45 };
-  if (category === "Family" || category === "Card Game") return { min: 20, max: 60 };
+  if (category === "Party") return { min: 10, max: 45 };
+  if (category === "Family" || category === "Card Game" || category === "Trivia")
+    return { min: 20, max: 60 };
   if (category === "Strategy" || category === "Eurogame") return { min: 45, max: 150 };
-  if (category === "Dungeon Crawler") return { min: 90, max: 240 };
   if (category === "War Game") return { min: 120, max: 360 };
   return { min: 30, max: 90 };
 }
 
 function makeComplexity(category) {
-  if (category === "Party" || category === "Family" || category === "Dexterity") {
+  if (category === "Party" || category === "Family" || category === "Trivia") {
     return Number(faker.number.float({ min: 1.0, max: 2.4, fractionDigits: 1 }));
   }
   if (category === "Strategy" || category === "Eurogame") {
@@ -137,9 +120,6 @@ function makeComplexity(category) {
   }
   if (category === "War Game") {
     return Number(faker.number.float({ min: 3.2, max: 4.9, fractionDigits: 1 }));
-  }
-  if (category === "Dungeon Crawler") {
-    return Number(faker.number.float({ min: 2.5, max: 4.6, fractionDigits: 1 }));
   }
   return Number(faker.number.float({ min: 1.8, max: 3.8, fractionDigits: 1 }));
 }
@@ -164,26 +144,13 @@ function makeShortDescription(category) {
   ];
 
   const byCategory = {
-    Party: [
-      "Fast, loud, and chaotic — ideal for big groups.",
-      "Quick rounds and hilarious moments every time.",
-    ],
-    Cooperative: [
-      "Work together to overcome the game’s challenges.",
-      "A cooperative adventure with tense teamwork decisions.",
-    ],
-    "Dungeon Crawler": [
-      "An epic adventure with heroes, loot, and tough enemies.",
-      "Explore, fight, level up — a full campaign experience.",
-    ],
-    Eurogame: [
-      "Optimize your strategy and build an efficient engine.",
-      "Tight decisions, low luck — pure strategy satisfaction.",
-    ],
-    "War Game": [
-      "A deep tactical conflict with meaningful positioning.",
-      "High strategy and long-term planning on the battlefield.",
-    ],
+    Party: ["Fast, loud, and chaotic — ideal for big groups.", "Quick rounds and hilarious moments every time."],
+    "Card Game": ["A clever card-driven experience with tight choices.", "Simple rules, deep gameplay — perfect for replay."],
+    Trivia: ["Test your knowledge with fun questions and surprising twists.", "A lively trivia experience for any group."],
+    Eurogame: ["Optimize your strategy and build an efficient engine.", "Tight decisions, low luck — pure strategy satisfaction."],
+    "War Game": ["A deep tactical conflict with meaningful positioning.", "High strategy and long-term planning on the battlefield."],
+    Strategy: ["Think ahead and outsmart your opponents in every round.", "Tactical depth with rewarding decisions."],
+    Family: ["Accessible rules and fun for everyone at the table.", "A friendly game with plenty of charm and replayability."],
   };
 
   const pool = byCategory[category] ? [...common, ...byCategory[category]] : common;
@@ -216,8 +183,7 @@ function makeGame(index) {
   const now = new Date().toISOString();
 
   return {
-    //sequential & deterministic ids
-    // If you want padded ids: game_001, game_002 -> use padStart
+    // sequential & deterministic ids
     gameId: `game_${index + 1}`,
     name: makeName(),
     category,
@@ -233,7 +199,6 @@ function makeGame(index) {
     releaseYear: faker.number.int({ min: 1995, max: new Date().getFullYear() }),
     languageDependence,
     shortDescription: makeShortDescription(category),
-    imageUrl: null,
     rating: {
       avg: ratingAvg,
       count: ratingCount,

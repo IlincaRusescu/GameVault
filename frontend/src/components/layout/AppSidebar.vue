@@ -1,5 +1,6 @@
 <template>
   <v-navigation-drawer
+    app
     v-model="drawerProxy"
     :temporary="isMobile"
     :permanent="!isMobile"
@@ -7,7 +8,6 @@
     width="280"
   >
     <div class="drawer-inner">
-      <!-- TOP MENU -->
       <v-list density="comfortable" nav class="menu">
         <v-list-item
           title="Dashboard"
@@ -28,7 +28,6 @@
         <v-list-item title="History" prepend-icon="mdi-history" :to="{ name: 'history' }" />
       </v-list>
 
-      <!-- FOOTER (BOTTOM) -->
       <div class="footer-box">
         <div class="footer-accent"></div>
 
@@ -36,7 +35,6 @@
           <p class="footer-title">GameVault</p>
           <p class="footer-sub">Your vault, always ready.</p>
 
-          <!-- mici “stats” placeholders -->
           <div class="mini">
             <div class="mini-item">
               <span class="mini-label">Games</span>
@@ -87,7 +85,6 @@ const drawerProxy = computed({
   padding-top: 8px;
 }
 
-/* FOOTER */
 .footer-box {
   margin-top: auto;
   padding: 14px 14px 16px;

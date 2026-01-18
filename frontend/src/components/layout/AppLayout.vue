@@ -29,14 +29,17 @@ watchEffect(() => {
 
 <style scoped>
 .layout-root {
-  min-height: 100vh;
+  height: 100vh;
 }
 
 .app-main {
   background: #111111;
+  height: 100%;
 }
 
+/* IMPORTANT: containerul trebuie sa aiba height ca view-urile sa poata umple */
 .app-container {
+  height: 100%;
   padding: 16px;
   max-width: 1400px;
   margin: 0 auto;

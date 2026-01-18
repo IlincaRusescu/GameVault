@@ -1,6 +1,5 @@
 <template>
-  <v-app-bar flat :height="75" class="app-navbar">
-    <!-- LEFT: logo icon + logo name -->
+  <v-app-bar app fixed flat :height="75" class="app-navbar">
     <div class="left">
       <v-btn icon variant="text" class="icon-btn" @click="toggleDrawer">
         <v-icon>mdi-menu</v-icon>
@@ -16,12 +15,10 @@
           contain
         />
 
-        <!-- IMPORTANT: width explicit ca să nu “colapseze” -->
         <v-img :src="logoName" alt="GameVault" width="150" height="32" class="brand-name" contain />
       </div>
     </div>
 
-    <!-- CENTER: slogan cu accent pe games & vault -->
     <div class="center" v-if="!isMobile">
       <span class="tagline">
         Your <span class="accent">games</span>. Your sessions. Your
@@ -29,11 +26,10 @@
       </span>
     </div>
 
-    <!-- RIGHT: Hi, username + logout icon button -->
     <div class="right">
-      <span class="hi"
-        >Hi, <span class="user">{{ displayName }}</span></span
-      >
+      <span class="hi">
+        Hi, <span class="user">{{ displayName }}</span>
+      </span>
 
       <v-btn icon class="logout-icon" @click="handleLogout" :title="'Logout'">
         <v-icon icon="mdi-logout" />
@@ -47,7 +43,6 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
-// ✅ Cel mai stabil în Vite: import assets
 import logoIcon from '@/assets/logo_img.png'
 import logoName from '@/assets/logo_name.png'
 
@@ -62,7 +57,6 @@ const auth = useAuthStore()
 
 const displayName = computed(() => {
   if (!auth.user) return 'User'
-  // adaptează ordinea după cum îți vine din backend
   return auth.user.username || auth.user.firstName || auth.user.email || 'User'
 })
 
@@ -84,7 +78,6 @@ function handleLogout() {
   padding: 0 12px;
 }
 
-/* LEFT */
 .left {
   display: flex;
   align-items: center;
@@ -110,7 +103,6 @@ function handleLogout() {
   margin-top: 2px;
 }
 
-/* CENTER */
 .center {
   flex: 1;
   display: flex;
@@ -129,7 +121,6 @@ function handleLogout() {
   font-weight: 700;
 }
 
-/* RIGHT */
 .right {
   display: flex;
   align-items: center;
