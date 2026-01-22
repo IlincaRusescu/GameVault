@@ -102,3 +102,55 @@ export function validateConfirmPassword(password, confirm) {
   if (confirm !== password) return 'Passwords do not match.'
   return ''
 }
+
+// --------------------
+// Catalog / Game validators
+// --------------------
+
+export function validateNonEmptyText(v, label = 'Field', min = 1, max = 200) {
+  const r = required(v, label)
+  if (r) return r
+
+  const s = String(v).trim()
+  if (s.length < min) return `${label} must be at least ${min} characters.`
+  if (s.length > max) return `${label} must be at most ${max} characters.`
+  return ''
+}
+
+export function validateReleaseYear(v) {
+  const r = required(v, 'Release Year')
+  if (r) return r
+
+  const n = Number(v)
+  if (!Number.isInteger(n)) return 'Release Year must be an integer.'
+  if (n < 1900) return 'Release Year must be at least 1900.'
+  if (n > 2100) return 'Release Year must be at most 2100.'
+  return ''
+}
+
+export function validateMinMax(minV, maxV, label = 'Value') {
+  const r1 = required(minV, `${label} Min`)
+  if (r1) return r1
+  const r2 = required(maxV, `${label} Max`)
+  if (r2) return r2
+
+  const minN = Number(minV)
+  const maxN = Number(maxV)
+
+  if (!Number.isInteger(minN) || !Number.isInteger(maxN)) return `${label} Min/Max must be integers.`
+  if (minN <= 0 || maxN <= 0) return `${label} Min/Max must be greater than 0.`
+  if (minN > maxN) return `${label} Min cannot be greater than ${label} Max.`
+  return ''
+}
+
+export function validateTags(v) {
+  if (!Array.isArray(v) || v.length === 0) return 'Tags are required.'
+  const clean = v.map((x) => String(x || '').trim()).filter(Boolean)
+  if (clean.length === 0) return 'Tags are required.'
+  return ''
+}
+
+export function sanitizeStringArray(arr) {
+  if (!Array.isArray(arr)) return []
+  return arr.map((x) => String(x || '').trim()).filter((x) => x.length > 0)
+}

@@ -10,6 +10,12 @@ export const useGamesStore = defineStore("games", {
     catalog: [],
     catalogLoading: false,
     catalogError: "",
+
+    catalogCreateLoading: false,
+    catalogCreateError: "",
+
+    catalogUpdateLoading: false,
+    catalogUpdateError: '',
   }),
 
   getters: {
@@ -27,7 +33,7 @@ export const useGamesStore = defineStore("games", {
     getToken() {
       let token = "";
 
-      // 1) Prefer token din auth store
+      // 1) token din auth store
       try {
         const auth = useAuthStore();
         token = auth?.token || "";
@@ -102,5 +108,86 @@ export const useGamesStore = defineStore("games", {
         this.catalogLoading = false;
       }
     },
+
+    async createCatalogGame(payload){
+      this.catalogCreateLoading = true;
+      this.catalogCreateError ="";
+
+      try{
+        const token = this.getToken();
+        const headers = {
+          "Content-Type": "application/json",
+        };
+
+        if(token) { 
+          headers.Authorization = `Bearer ${token}`;
+        }
+
+        console.log('CREATE: API_BASE_URL =', API_BASE_URL)
+        console.log('CREATE: token present =', !!token)
+        console.log('CREATE: payload =', payload)
+
+        const res = await fetch(`${API_BASE_URL}/api/catalog`, {
+          method: "POST",
+          headers,
+          body: JSON.stringify(payload),
+        });
+
+        console.log('CREATE: status =', res.status)
+
+        if(!res.ok) {
+          let msg = "";
+          try{
+            msg = await res.text();
+          }catch(e){}
+          throw new Error(msg || `Request failed with ${res.status}`);
+        }
+
+        const data = await res.json();
+        return data;
+      } catch(e){
+        this.catalogCreateError = e?.message || "Failed to create game.";
+        throw e;
+      }finally {
+        this.catalogCreateLoading = false;
+      }
+    },
+
+    async updateCatalogGame(id, payload) {
+      this.catalogUpdateLoading = true
+      this.catalogUpdateError = ''
+
+      try {
+        const token = this.getToken()
+        const headers = { 'Content-Type': 'application/json' }
+        if (token) headers.Authorization = `Bearer ${token}`
+
+        const res = await fetch(`${API_BASE_URL}/api/catalog/${id}`, {
+          method: 'PUT',
+          headers,
+          body: JSON.stringify(payload),
+        })
+
+        if (!res.ok) {
+          let msg = ''
+          try {
+            const err = await res.json()
+            msg = err.message || ''
+          } catch (e) {
+            try {
+              msg = await res.text()
+            } catch (_) {}
+          }
+          throw new Error(msg || `Request failed with ${res.status}`)
+        }
+
+        return await res.json()
+      } catch (e) {
+        this.catalogUpdateError = e?.message || 'Failed to update game.'
+        throw e
+      } finally {
+        this.catalogUpdateLoading = false
+      }
+    }
   },
 });

@@ -1,6 +1,10 @@
 <template>
   <div class="catalog-view">
     <PageHeader :title="headerTitle" class="catalog-header">
+      <v-btn size="small" variant="flat" color="primary" @click="openCreateDialog">
+        Add New Game
+      </v-btn>
+
       <v-btn
         size="small"
         variant="tonal"
@@ -32,9 +36,33 @@
             <span>{{ formatThemes(item.themes) }}</span>
           </template>
 
-          <!-- Actions -->
           <template #item.actions="{ item }">
             <div class="actions-cell">
+              <!-- INFO button (secondary) -->
+              <v-btn
+                v-if="isMobile"
+                size="small"
+                color="secondary"
+                variant="flat"
+                class="info-btn"
+                @click="openInfo(item)"
+                :title="'Info'"
+              >
+                i
+              </v-btn>
+
+              <v-btn
+                v-else
+                size="small"
+                color="secondary"
+                variant="flat"
+                class="info-btn"
+                @click="openInfo(item)"
+              >
+                Info
+              </v-btn>
+
+              <!-- ADD button -->
               <v-btn
                 v-if="isMobile"
                 size="small"
@@ -69,13 +97,29 @@
         </v-data-table>
       </v-card-text>
     </v-card>
+
+    <NewGameDialog
+      v-model="createDialog"
+      :existing-game-ids="existingGameIds"
+      :loading="gamesStore.catalogCreateLoading"
+      @save="onSaveNewGame"
+    />
+
+    <GameInfoDialog
+      v-model="infoDialog"
+      :game="selectedGame"
+      :saving="gamesStore.catalogUpdateLoading"
+      @save="onSaveGameUpdate"
+    />
   </div>
 </template>
 
 <script setup>
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useDisplay } from 'vuetify'
 import PageHeader from '@/components/layout/PageHeader.vue'
+import NewGameDialog from '@/components/ui/NewGameDialog.vue'
+import GameInfoDialog from '@/components/ui/GameInfoDialog.vue'
 import { useGamesStore } from '@/stores/games'
 
 const gamesStore = useGamesStore()
@@ -121,17 +165,57 @@ function formatThemes(themes) {
   if (Array.isArray(themes) && themes.length) return themes.join(', ')
   return '—'
 }
+
+/*dialog state + save handler */
+const createDialog = ref(false)
+
+const existingGameIds = computed(() =>
+  gamesStore.sortedCatalog.map((g) => String(g.gameId || '')).filter(Boolean),
+)
+
+function openCreateDialog() {
+  createDialog.value = true
+}
+
+async function onSaveNewGame(payload) {
+  console.log('SAVE PAYLOAD:', payload)
+  await gamesStore.createCatalogGame(payload)
+  await gamesStore.fetchCatalog()
+  createDialog.value = false
+}
+
+/* info dialog state */
+const infoDialog = ref(false)
+const selectedGame = ref(null)
+
+function openInfo(item) {
+  selectedGame.value = item
+  infoDialog.value = true
+}
+
+async function onSaveGameUpdate(payload) {
+  // payload = { id, ...fields }
+  const id = payload.id
+  const body = { ...payload }
+  delete body.id
+
+  await gamesStore.updateCatalogGame(id, body)
+  await gamesStore.fetchCatalog()
+
+  // keep the dialog open with updated data, or close it:
+  infoDialog.value = false
+  selectedGame.value = null
+}
 </script>
 
 <style scoped>
-/* View-ul ocupa toata inaltimea disponibila din container-ul de content */
+/* 100hv */
 .catalog-view {
   height: 100%;
   display: flex;
   flex-direction: column;
 }
 
-/* Card-ul cu tabelul umple tot spatiul ramas */
 .table-card {
   flex: 1;
   min-height: 0;
@@ -140,7 +224,7 @@ function formatThemes(themes) {
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/* Continutul cardului devine layout vertical ca tabelul sa poata ocupa tot */
+/* Continutul cardului - layout vertical - tabelul ocupa tot */
 .table-card__content {
   height: 100%;
   display: flex;
@@ -154,13 +238,13 @@ function formatThemes(themes) {
   min-height: 0;
 }
 
-/* Scroller-ul real al tabelului */
+/* Scroller tabelului */
 .catalog-table :deep(.v-table__wrapper) {
   height: 100%;
   overflow: auto;
 }
 
-/* Sticky header: aplicam pe th (cel mai robust in Vuetify 3) */
+/* Sticky header: aplicam pe th */
 .catalog-table :deep(thead th) {
   position: sticky;
   top: 0;
@@ -182,5 +266,11 @@ function formatThemes(themes) {
   min-width: 36px;
   padding: 0 10px;
   font-weight: 800;
+}
+.info-btn {
+  min-width: 44px;
+  padding: 0 12px;
+  font-weight: 700;
+  margin-right: 5px;
 }
 </style>
