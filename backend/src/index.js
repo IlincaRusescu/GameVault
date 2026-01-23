@@ -11,6 +11,7 @@ const { initFirebaseAdmin } = require("./services/firebaseAdmin");
 const app = express();
 
 const catalogRoutes = require("./routes/catalog.routes");
+const libraryRoutes = require("./routes/library.routes");
 
 
 app.use(cors());
@@ -18,6 +19,7 @@ app.use(express.json());
 app.use(morgan("dev"));
 
 app.use("/api/catalog", catalogRoutes);
+app.use("/library", libraryRoutes);
 
 
 // init firebase admin (o singură dată la pornire)

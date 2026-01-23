@@ -22,6 +22,10 @@
           {{ gamesStore.catalogError }}
         </v-alert>
 
+        <v-alert v-if="libraryStore.libraryError" type="error" variant="tonal" class="mb-4">
+          {{ libraryStore.libraryError }}
+        </v-alert>
+
         <v-data-table
           :headers="activeHeaders"
           :items="gamesStore.sortedCatalog"
@@ -69,8 +73,10 @@
                 color="primary"
                 variant="flat"
                 class="plus-btn"
+                :disabled="isInLibrary(item.id) || addBusyId === item.id"
+                :loading="addBusyId === item.id"
                 @click="onAddToLibrary(item)"
-                :title="'Add in library'"
+                :title="isInLibrary(item.id) ? 'Already in library' : 'Add in library'"
               >
                 +
               </v-btn>
@@ -80,9 +86,11 @@
                 size="small"
                 color="primary"
                 variant="flat"
+                :disabled="isInLibrary(item.id) || addBusyId === item.id"
+                :loading="addBusyId === item.id"
                 @click="onAddToLibrary(item)"
               >
-                + Add in library
+                {{ isInLibrary(item.id) ? 'In Library' : '+ Add in library' }}
               </v-btn>
             </div>
           </template>
@@ -121,8 +129,10 @@ import PageHeader from '@/components/layout/PageHeader.vue'
 import NewGameDialog from '@/components/ui/NewGameDialog.vue'
 import GameInfoDialog from '@/components/ui/GameInfoDialog.vue'
 import { useGamesStore } from '@/stores/games'
+import { useLibraryStore } from '@/stores/library'
 
 const gamesStore = useGamesStore()
+const libraryStore = useLibraryStore()
 const { mdAndDown } = useDisplay()
 const isMobile = computed(() => mdAndDown.value)
 
@@ -143,22 +153,18 @@ const desktopHeaders = [
 const mobileHeaders = [
   { title: 'Name', key: 'name', sortable: true },
   { title: 'Category', key: 'category', sortable: true },
-  { title: 'Theme', key: 'themes', sortable: true },
   { title: '', key: 'actions', sortable: false, align: 'end' },
 ]
 
 const activeHeaders = computed(() => (isMobile.value ? mobileHeaders : desktopHeaders))
 
 onMounted(async () => {
-  await gamesStore.fetchCatalog()
+  await Promise.all([gamesStore.fetchCatalog(), libraryStore.fetchLibrary()])
 })
 
 async function refresh() {
   await gamesStore.fetchCatalog()
-}
-
-function onAddToLibrary(item) {
-  console.log('Add it in library:', item)
+  await libraryStore.fetchLibrary()
 }
 
 function formatThemes(themes) {
@@ -166,7 +172,25 @@ function formatThemes(themes) {
   return '—'
 }
 
-/*dialog state + save handler */
+function isInLibrary(id) {
+  return libraryStore.isInLibrary(id)
+}
+
+const addBusyId = ref(null)
+
+async function onAddToLibrary(item) {
+  if (!item?.id) return
+  if (isInLibrary(item.id)) return
+
+  addBusyId.value = item.id
+  try {
+    await libraryStore.addToLibrary(item.id)
+  } finally {
+    addBusyId.value = null
+  }
+}
+
+/* dialog state + save handler */
 const createDialog = ref(false)
 
 const existingGameIds = computed(() =>
@@ -194,7 +218,6 @@ function openInfo(item) {
 }
 
 async function onSaveGameUpdate(payload) {
-  // payload = { id, ...fields }
   const id = payload.id
   const body = { ...payload }
   delete body.id
@@ -202,7 +225,6 @@ async function onSaveGameUpdate(payload) {
   await gamesStore.updateCatalogGame(id, body)
   await gamesStore.fetchCatalog()
 
-  // keep the dialog open with updated data, or close it:
   infoDialog.value = false
   selectedGame.value = null
 }
