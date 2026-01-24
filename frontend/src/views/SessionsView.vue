@@ -49,7 +49,7 @@
                 variant="tonal"
                 :loading="deleteBusyId === item.id"
                 :disabled="deleteBusyId === item.id"
-                @click="onDelete(item)"
+                @click="openDeleteDialog(item)"
               >
                 Delete
               </v-btn>
@@ -77,6 +77,18 @@
       :initial="editInitial"
       @submit="onEditSubmit"
     />
+
+    <!-- Confirm delete session -->
+    <ConfirmDialog
+      v-model="deleteDialog"
+      title="Delete session"
+      :message="deleteTarget ? `Delete session for &quot;${deleteTarget.gameName}&quot;?` : ''"
+      confirm-text="Delete"
+      confirm-color="error"
+      :loading="deleteBusyId === (deleteTarget?.id || null)"
+      @confirm="confirmDelete"
+      @cancel="closeDeleteDialog"
+    />
   </div>
 </template>
 
@@ -85,6 +97,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useDisplay } from 'vuetify'
 import PageHeader from '@/components/layout/PageHeader.vue'
 import SessionDialog from '@/components/ui/SessionDialog.vue'
+import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
 import { useSessionsStore } from '@/stores/sessions'
 
 const sessionsStore = useSessionsStore()
@@ -128,12 +141,9 @@ function formatDate(createdAt) {
 
   let date = null
 
-  // Firestore Timestamp
   if (typeof createdAt?.toDate === 'function') {
     date = createdAt.toDate()
-  }
-  // Timestamp serializat din backend
-  else if (typeof createdAt === 'object') {
+  } else if (typeof createdAt === 'object') {
     const seconds =
       typeof createdAt._seconds === 'number'
         ? createdAt._seconds
@@ -146,7 +156,6 @@ function formatDate(createdAt) {
     }
   }
 
-  // fallback
   if (!date) date = new Date(createdAt)
   if (Number.isNaN(date.getTime())) return '—'
 
@@ -187,18 +196,33 @@ async function onEditSubmit(payload) {
   }
 }
 
-// Delete
+// Delete (Vuetify confirm + finally)
 const deleteBusyId = ref(null)
+const deleteDialog = ref(false)
+const deleteTarget = ref(null)
 
-async function onDelete(item) {
-  if (!item?.gameId || !item?.id) return
+function openDeleteDialog(item) {
+  deleteTarget.value = item
+  deleteDialog.value = true
+}
 
-  const ok = confirm(`Delete session for "${item.gameName}"?`)
-  if (!ok) return
+function closeDeleteDialog() {
+  deleteDialog.value = false
+  deleteTarget.value = null
+}
 
-  deleteBusyId.value = item.id
-  await sessionsStore.deleteSession(item.gameId, item.id)
-  deleteBusyId.value = null
+async function confirmDelete() {
+  if (!deleteTarget.value?.gameId || !deleteTarget.value?.id) return
+
+  const sessionId = deleteTarget.value.id
+  deleteBusyId.value = sessionId
+
+  try {
+    await sessionsStore.deleteSession(deleteTarget.value.gameId, sessionId)
+  } finally {
+    deleteBusyId.value = null
+    closeDeleteDialog()
+  }
 }
 </script>
 

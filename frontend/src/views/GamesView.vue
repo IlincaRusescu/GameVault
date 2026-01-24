@@ -57,7 +57,7 @@
                 variant="tonal"
                 :loading="removeBusyId === item.id"
                 :disabled="removeBusyId === item.id"
-                @click="onRemove(item)"
+                @click="openRemoveDialog(item)"
               >
                 Remove
               </v-btn>
@@ -85,6 +85,18 @@
       :initial="createInitial"
       @submit="onCreateSession"
     />
+
+    <!-- Confirm remove game -->
+    <ConfirmDialog
+      v-model="removeDialog"
+      title="Remove game"
+      :message="removeTarget ? `Remove &quot;${removeTarget.name}&quot; from your library?` : ''"
+      confirm-text="Remove"
+      confirm-color="error"
+      :loading="removeBusyId === (removeTarget?.id || null)"
+      @confirm="confirmRemove"
+      @cancel="closeRemoveDialog"
+    />
   </div>
 </template>
 
@@ -93,11 +105,14 @@ import { computed, onMounted, ref } from 'vue'
 import { useDisplay } from 'vuetify'
 import PageHeader from '@/components/layout/PageHeader.vue'
 import { useLibraryStore } from '@/stores/library'
-
 import { useSessionsStore } from '@/stores/sessions'
+
 import SessionDialog from '@/components/ui/SessionDialog.vue'
+import ConfirmDialog from '@/components/ui/ConfirmDialog.vue'
 
 const libraryStore = useLibraryStore()
+console.log('removeFromLibrary typeof:', typeof libraryStore.removeFromLibrary)
+console.log('libraryStore keys:', Object.keys(libraryStore))
 const sessionsStore = useSessionsStore()
 
 const { mdAndDown } = useDisplay()
@@ -174,24 +189,39 @@ async function onCreateSession(payload) {
   }
 }
 
-/* remove from library */
+/* remove from library (Vuetify confirm) */
 const removeBusyId = ref(null)
+const removeDialog = ref(false)
+const removeTarget = ref(null)
 
-async function onRemove(item) {
-  if (!item?.id) return
+function openRemoveDialog(item) {
+  removeTarget.value = item
+  removeDialog.value = true
+}
 
-  const ok = confirm(`Remove "${item.name}" from your library?`)
-  if (!ok) return
+function closeRemoveDialog() {
+  removeDialog.value = false
+  removeTarget.value = null
+}
 
-  removeBusyId.value = item.id
-  const success = await libraryStore.removeFromLibrary(item.id)
-  removeBusyId.value = null
+async function confirmRemove() {
+  if (!removeTarget.value?.id) return
 
-  // dacă ștergi jocul pe care ai dialog deschis, închidem dialogul
-  if (success && selectedGameId.value === item.id) {
-    sessionDialog.value = false
-    selectedGameId.value = ''
-    selectedGameName.value = ''
+  const id = removeTarget.value.id
+  removeBusyId.value = id
+
+  try {
+    const success = await libraryStore.removeFromLibrary(id)
+
+    // dacă ștergi jocul pe care ai dialog deschis, închidem dialogul
+    if (success && selectedGameId.value === id) {
+      sessionDialog.value = false
+      selectedGameId.value = ''
+      selectedGameName.value = ''
+    }
+  } finally {
+    removeBusyId.value = null
+    closeRemoveDialog()
   }
 }
 </script>

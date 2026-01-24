@@ -26,25 +26,16 @@
         />
       </v-list>
 
+      <!-- SIMPLE FOOTER -->
       <div class="footer-box">
-        <div class="footer-accent"></div>
-
         <div class="footer-content">
           <p class="footer-title">GameVault</p>
-          <p class="footer-sub">Your vault, always ready.</p>
 
-          <div class="mini">
-            <div class="mini-item">
-              <span class="mini-label">Games</span>
-              <span class="mini-value">—</span>
-            </div>
-            <div class="mini-item">
-              <span class="mini-label">Sessions</span>
-              <span class="mini-value">—</span>
-            </div>
-          </div>
+          <p class="footer-text">© 2026 GameVault</p>
 
-          <p class="footer-hint">v0.1 • Beta</p>
+          <p class="footer-text">📞 +40 700 000 000</p>
+
+          <p class="footer-text">✉️ support@gamevault.app</p>
         </div>
       </div>
     </div>
@@ -83,69 +74,28 @@ const drawerProxy = computed({
   padding-top: 8px;
 }
 
+/* footer */
 .footer-box {
   margin-top: auto;
-  padding: 14px 14px 16px;
-}
-
-.footer-accent {
-  height: 2px;
-  width: 70px;
-  background: #fe9100;
-  border-radius: 999px;
-  margin-bottom: 10px;
+  padding: 14px;
 }
 
 .footer-content {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
+  border-radius: 12px;
   padding: 12px;
 }
 
 .footer-title {
-  margin: 0;
+  margin: 0 0 6px;
   font-weight: 800;
-  color: rgba(255, 255, 255, 0.92);
+  font-size: 14px;
 }
 
-.footer-sub {
-  margin: 4px 0 10px;
+.footer-text {
+  margin: 2px 0;
   font-size: 12px;
-  opacity: 0.7;
-}
-
-.mini {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin-bottom: 10px;
-}
-
-.mini-item {
-  background: rgba(0, 0, 0, 0.25);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  padding: 8px;
-}
-
-.mini-label {
-  display: block;
-  font-size: 11px;
-  opacity: 0.65;
-}
-
-.mini-value {
-  display: block;
-  font-size: 16px;
-  font-weight: 800;
-  color: #fe9100;
-  margin-top: 2px;
-}
-
-.footer-hint {
-  margin: 0;
-  font-size: 11px;
-  opacity: 0.55;
+  opacity: 0.75;
 }
 </style>
