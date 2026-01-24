@@ -85,7 +85,7 @@
                 v-else
                 size="small"
                 color="primary"
-                variant="flat"
+                class="library-btn"
                 :disabled="isInLibrary(item.id) || addBusyId === item.id"
                 :loading="addBusyId === item.id"
                 @click="onAddToLibrary(item)"
@@ -282,6 +282,7 @@ async function onSaveGameUpdate(payload) {
 .actions-cell {
   display: flex;
   justify-content: flex-end;
+  gap: 6px;
 }
 
 .plus-btn {
@@ -294,5 +295,10 @@ async function onSaveGameUpdate(payload) {
   padding: 0 12px;
   font-weight: 700;
   margin-right: 5px;
+}
+
+.library-btn {
+  min-width: 150px; /* Alege ce arată bine: 140–160 */
+  justify-content: center;
 }
 </style>
