@@ -154,3 +154,32 @@ export function sanitizeStringArray(arr) {
   if (!Array.isArray(arr)) return []
   return arr.map((x) => String(x || '').trim()).filter((x) => x.length > 0)
 }
+
+// --------------------
+// Library / Sessions
+// --------------------
+
+export function validateSessionForm({ durationMinutes, playersText, winner }) {
+  const errors = {};
+
+  const dur = Number(durationMinutes);
+  if (!Number.isFinite(dur) || dur <= 0) {
+    errors.durationMinutes = "Duration must be a positive number.";
+  }
+
+  // playersText: optional, dar dacă e complet gol -> warn (poți scoate dacă vrei)
+  const pt = (playersText || "").toString().trim();
+  if (!pt) {
+    errors.playersText = "Please enter at least 1 player.";
+  }
+
+  // winner: optional (sau poți cere să fie unul din players - dar nu facem overengineering)
+  if ((winner || "").toString().length > 60) {
+    errors.winner = "Winner name is too long.";
+  }
+
+  return {
+    isValid: Object.keys(errors).length === 0,
+    errors,
+  };
+}

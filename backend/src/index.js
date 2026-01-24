@@ -12,6 +12,7 @@ const app = express();
 
 const catalogRoutes = require("./routes/catalog.routes");
 const libraryRoutes = require("./routes/library.routes");
+const sessionsRoutes = require("./routes/sessions.routes");
 
 
 app.use(cors());
@@ -20,6 +21,7 @@ app.use(morgan("dev"));
 
 app.use("/api/catalog", catalogRoutes);
 app.use("/library", libraryRoutes);
+app.use("/sessions", sessionsRoutes);
 
 
 // init firebase admin (o singură dată la pornire)

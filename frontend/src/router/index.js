@@ -16,7 +16,6 @@ import DashboardView from "@/views/DashboardView.vue";
 import GamesView from "@/views/GamesView.vue";
 import SessionsView from "@/views/SessionsView.vue";
 import CatalogView from "@/views/CatalogView.vue";
-import HistoryView from "@/views/HistoryView.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -53,7 +52,6 @@ const router = createRouter({
         { path: "games", name: "games", component: GamesView },
         { path: "sessions", name: "sessions", component: SessionsView },
         { path: "catalog", name: "catalog", component: CatalogView },
-        { path: "history", name: "history", component: HistoryView },
       ],
     },
 

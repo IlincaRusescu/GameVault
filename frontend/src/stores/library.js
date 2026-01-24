@@ -99,4 +99,36 @@ export const useLibraryStore = defineStore("library", {
       return this.libraryIdsSet.has(String(gameId));
     },
   },
+  async removeFromLibrary(gameId) {
+  this.libraryError = "";
+
+  try {
+    const token = this._getToken();
+    if (!token) {
+      this.libraryError = "Missing auth token. Please log in again.";
+      return false;
+    }
+
+    const res = await fetch(`${API_BASE_URL}/library/${gameId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await res.json().catch(() => ({}));
+
+    if (!res.ok) {
+      this.libraryError = data?.message || `Failed to remove game (${res.status}).`;
+      return false;
+    }
+
+    await this.fetchLibrary();
+    return true;
+  } catch (err) {
+    console.error("Remove from library failed:", err);
+    this.libraryError = err?.message || "Failed to remove game.";
+    return false;
+  }
+},
 });

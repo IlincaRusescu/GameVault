@@ -24,8 +24,6 @@
           prepend-icon="mdi-account-group"
           :to="{ name: 'sessions' }"
         />
-
-        <v-list-item title="History" prepend-icon="mdi-history" :to="{ name: 'history' }" />
       </v-list>
 
       <div class="footer-box">
