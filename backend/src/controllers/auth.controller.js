@@ -61,7 +61,6 @@ async function sendPasswordResetEmail(email) {
       requestType: "PASSWORD_RESET",
       email,
       continueUrl,
-      // optional
       canHandleCodeInApp: true,
     }),
   });
@@ -130,7 +129,7 @@ async function checkUsername(req, res) {
   }
 }
 
-// -------------------- controller: register --------------------
+// -------------------- controller: REGISTER --------------------
 async function register(req, res) {
   try {
     const {
@@ -227,7 +226,7 @@ async function register(req, res) {
   }
 }
 
-// -------------------- controller: login --------------------
+// -------------------- controller: LOGIN --------------------
 async function login(req, res) {
   try {
     const { email, password } = req.body;
@@ -266,7 +265,7 @@ async function login(req, res) {
   }
 }
 
-// -------------------- controller: me --------------------
+// -------------------- controller: ME   --------------------
 function me(req, res) {
   return res.status(200).json({
     user: {

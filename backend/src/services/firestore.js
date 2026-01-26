@@ -35,3 +35,13 @@ function getDb() {
 }
 
 module.exports = { initFirebaseAdmin, getAdmin, getDb };
+
+
+// //const { admin, initFirebaseAdmin } = require("../config/firebaseAdmin");
+
+// function getDb() {
+//   initFirebaseAdmin();
+//   return admin.firestore();
+// }
+
+// module.exports = { initFirebaseAdmin, admin, getDb };

@@ -6,7 +6,7 @@ require("dotenv").config();
 const debugRoutes = require("./routes/debug.routes");
 const authRoutes = require("./routes/auth.routes");
 
-const { initFirebaseAdmin } = require("./services/firebaseAdmin");
+const { initFirebaseAdmin } = require("./services/firestore")
 
 const app = express();
 
@@ -14,7 +14,7 @@ const catalogRoutes = require("./routes/catalog.routes");
 const libraryRoutes = require("./routes/library.routes");
 const sessionsRoutes = require("./routes/sessions.routes");
 
-
+//setarile de baza care fac serverul utilizabil cu un frontend.
 app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"));
@@ -27,6 +27,8 @@ app.use("/sessions", sessionsRoutes);
 // init firebase admin (o singură dată la pornire)
 initFirebaseAdmin();
 
+
+//Endpoint de health-check
 app.get("/health", (req, res) => {
   res.status(200).json({
     ok: true,

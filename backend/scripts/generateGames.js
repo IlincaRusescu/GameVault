@@ -1,11 +1,9 @@
-/* backend/scripts/generateGames.js */
 const fs = require("fs");
 const path = require("path");
 const { faker } = require("@faker-js/faker");
 
 /**
  * BOARD GAME catalog generator
- * Output: backend/scripts/games.json
  *
  * Run (from backend/):
  *   node scripts/generateGames.js 50

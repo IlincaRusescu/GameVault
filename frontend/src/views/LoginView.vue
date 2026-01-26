@@ -82,7 +82,7 @@ async function onSubmit() {
   try {
     await auth.login(email.value, password.value)
     success.value = 'Logged in successfully!'
-    router.push('/games')
+    router.push('/dashboard')
   } catch (e) {
     error.value = e?.message || 'Login failed.'
   } finally {
